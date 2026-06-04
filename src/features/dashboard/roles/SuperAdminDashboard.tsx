@@ -1,127 +1,106 @@
 import { useMemo } from "react";
-import {
-  Activity,
-  Layers,
-  Network,
-  Users,
-  UserCheck,
-  UserX,
-} from "lucide-react";
-import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Activity, BarChart3, Building2, Network, TrendingUp, UserCog, Users } from "lucide-react";
 import {
   DashHeader,
   StatGrid,
-  Panel,
   ListCard,
   QuickActions,
   ChartCard,
   BarSeries,
   recentActivityItems,
+  type ListItem,
 } from "@/features/dashboard/blocks";
 import type { StatCardProps } from "@/components/shared/StatCard";
-import { db } from "@/data/db";
+import { platformStats } from "@/data/services";
 import { areaRoute } from "@/lib/routes";
-import type { RoleKey } from "@/types";
-
-/** Compact axis labels for the members-by-role chart. */
-const ROLE_SHORT: Partial<Record<RoleKey, string>> = {
-  admin: "Admin",
-  principal: "Principal",
-  accountant: "Accounts",
-  receptionist: "Reception",
-  librarian: "Library",
-  lab_assistant: "Lab",
-  examiner: "Exams",
-  sports_coach: "Sports",
-  class_teacher: "Class Tch",
-  subject_teacher: "Subject Tch",
-  bus_driver: "Driver",
-  bus_helper: "Helper",
-  other_staff: "Other",
-};
+import { formatMoneyCompact } from "@/lib/format";
 
 export function SuperAdminDashboard() {
-  const data = useMemo(() => {
-    const staff = db.getAll("staff");
-    const students = db.getAll("students");
-    const guardians = db.getAll("guardians");
-    const users = db.getAll("users");
-    const services = db.getAll("serviceModules");
+  const ps = useMemo(() => platformStats(), []);
 
-    const totalMembers = staff.length + students.length + guardians.length;
-    const activeMembers = users.filter((u) => u.status === "active").length;
-    const inactiveMembers = users.filter((u) => u.status === "inactive").length;
+  const stats: StatCardProps[] = useMemo(
+    () => [
+      {
+        label: "Schools",
+        value: `${ps.activeSchools}/${ps.totalSchools}`,
+        icon: Building2,
+        tone: "primary",
+        to: areaRoute("schools"),
+        hint: `${ps.suspendedSchools} suspended`,
+      },
+      {
+        label: "Total Students",
+        value: ps.totalStudents.toLocaleString("en-IN"),
+        icon: Users,
+        tone: "info",
+        hint: "all schools",
+      },
+      {
+        label: "Total Staff",
+        value: ps.totalStaff.toLocaleString("en-IN"),
+        icon: UserCog,
+        tone: "success",
+      },
+      {
+        label: "Platform MRR",
+        value: formatMoneyCompact(ps.mrr),
+        icon: TrendingUp,
+        tone: "accent",
+        hint: "recurring/mo",
+      },
+    ],
+    [ps],
+  );
 
-    // Service module breakdown
-    const live = services.filter((s) => s.isEnabled && s.isVisible).length;
-    const hidden = services.filter((s) => s.isEnabled && !s.isVisible).length;
-    const disabled = services.filter((s) => !s.isEnabled).length;
+  const studentsBySchool = useMemo(
+    () => ps.schools.map((r) => ({ name: r.school.name.split(" ")[0], Students: r.metrics.students })),
+    [ps],
+  );
 
-    // Staff grouped by role (super_admin excluded — that's the owner, not a managed member set)
-    const counts = new Map<RoleKey, number>();
-    for (const s of staff) {
-      if (s.roleKey === "super_admin") continue;
-      counts.set(s.roleKey, (counts.get(s.roleKey) ?? 0) + 1);
-    }
-    const byRole = Array.from(counts.entries())
-      .map(([roleKey, count]) => ({ role: ROLE_SHORT[roleKey] ?? roleKey, Members: count }))
-      .sort((a, b) => b.Members - a.Members);
+  const needsAttention: ListItem[] = useMemo(
+    () =>
+      ps.schools
+        .filter((r) => r.school.subscriptionStatus === "overdue" || !r.school.isActive)
+        .map((r) => ({
+          id: r.school.id,
+          title: r.school.name,
+          subtitle: r.school.city,
+          badge: {
+            label: !r.school.isActive ? "Suspended" : "Overdue",
+            variant: (!r.school.isActive ? "secondary" : "destructive") as "secondary" | "destructive",
+          },
+          to: areaRoute("schools/" + r.school.id),
+        })),
+    [ps],
+  );
 
-    return {
-      totalMembers,
-      activeMembers,
-      inactiveMembers,
-      live,
-      hidden,
-      disabled,
-      servicesTotal: services.length,
-      byRole,
-    };
-  }, []);
+  const topByRevenue: ListItem[] = useMemo(
+    () =>
+      [...ps.schools]
+        .sort((a, b) => b.metrics.monthlyRevenue - a.metrics.monthlyRevenue)
+        .slice(0, 5)
+        .map((r) => ({
+          id: r.school.id,
+          title: r.school.name,
+          subtitle: `${r.school.plan ?? "—"} plan`,
+          to: areaRoute("schools/" + r.school.id),
+          right: <span className="font-mono text-sm">{formatMoneyCompact(r.metrics.monthlyRevenue)}</span>,
+        })),
+    [ps],
+  );
 
-  const stats: StatCardProps[] = [
-    {
-      label: "Total Members",
-      value: data.totalMembers.toLocaleString("en-IN"),
-      icon: Users,
-      tone: "primary",
-      to: areaRoute("members"),
-      hint: "Staff, students & guardians",
-    },
-    {
-      label: "Active Members",
-      value: data.activeMembers.toLocaleString("en-IN"),
-      icon: UserCheck,
-      tone: "success",
-      hint: "Accounts active",
-    },
-    {
-      label: "Inactive Members",
-      value: data.inactiveMembers.toLocaleString("en-IN"),
-      icon: UserX,
-      tone: "danger",
-      hint: "Accounts disabled",
-    },
-    {
-      label: "Services Live",
-      value: data.live,
-      icon: Network,
-      tone: "info",
-      to: areaRoute("services"),
-      hint: `of ${data.servicesTotal} modules`,
-    },
-  ];
+  const recent = useMemo(() => recentActivityItems(6), []);
 
   return (
     <div className="space-y-6">
       <DashHeader
+        subtitleOverride="Platform overview across all schools"
         actions={
           <QuickActions
             actions={[
-              { label: "Services Registry", icon: Network, to: areaRoute("services"), tone: "accent" },
-              { label: "All Members", icon: Users, to: areaRoute("members") },
+              { label: "All Schools", icon: Building2, to: areaRoute("schools"), tone: "accent" },
+              { label: "Platform Analytics", icon: BarChart3, to: areaRoute("reports") },
+              { label: "Services Registry", icon: Network, to: areaRoute("services") },
               { label: "Activity Log", icon: Activity, to: areaRoute("activity") },
             ]}
           />
@@ -132,44 +111,37 @@ export function SuperAdminDashboard() {
 
       <div className="grid gap-4 lg:grid-cols-3">
         <div className="lg:col-span-2">
-          <ChartCard title="Members by Role">
-            <BarSeries data={data.byRole} xKey="role" series={[{ key: "Members", label: "Members" }]} />
+          <ChartCard title="Students by School">
+            <BarSeries data={studentsBySchool} xKey="name" series={[{ key: "Students", label: "Students" }]} />
           </ChartCard>
         </div>
-
-        <Panel title="Services" icon={Layers} action={
-          <Button asChild variant="ghost" size="sm">
-            <Link to={areaRoute("services")}>Manage</Link>
-          </Button>
-        }>
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">Live</span>
-              <Badge variant="success">{data.live} enabled</Badge>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">Hidden</span>
-              <Badge variant="warning">{data.hidden} not visible</Badge>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">Disabled</span>
-              <Badge variant="destructive">{data.disabled} off</Badge>
-            </div>
-            <p className="pt-1 text-xs text-muted-foreground">
-              {data.servicesTotal} modules in the platform registry.
-            </p>
-          </div>
-        </Panel>
+        <ListCard
+          title="Needs Attention"
+          icon={Activity}
+          items={needsAttention}
+          emptyText="All schools healthy"
+          viewAllTo={areaRoute("schools")}
+        />
       </div>
 
-      <ListCard
-        title="Recent Platform Activity"
-        icon={Activity}
-        items={recentActivityItems(7)}
-        viewAllTo={areaRoute("activity")}
-        emptyText="No recent activity"
-        max={7}
-      />
+      <div className="grid gap-4 lg:grid-cols-3">
+        <div className="lg:col-span-2">
+          <ListCard
+            title="Top Schools by Revenue"
+            icon={TrendingUp}
+            items={topByRevenue}
+            emptyText="No revenue recorded"
+            viewAllTo={areaRoute("schools")}
+          />
+        </div>
+        <ListCard
+          title="Recent Platform Activity"
+          icon={Activity}
+          items={recent}
+          emptyText="No recent activity"
+          viewAllTo={areaRoute("activity")}
+        />
+      </div>
     </div>
   );
 }

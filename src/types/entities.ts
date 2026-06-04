@@ -65,6 +65,16 @@ export interface School extends Base {
   sessionStartMonth: number;
   defaultLanguage: Language;
   isActive: boolean;
+  // ── platform / multi-school fields (Super Admin portfolio) ──
+  isPrimary?: boolean; // the fully-built, drillable school
+  region?: string;
+  plan?: "basic" | "standard" | "premium" | "enterprise";
+  subscriptionAmount?: number; // annual platform fee
+  subscriptionStatus?: "active" | "overdue" | "trial";
+  nextBillingDate?: string;
+  onboardedAt?: string;
+  /** Summary metrics for non-primary schools (primary computes these live). */
+  metrics?: { students: number; staff: number; monthlyRevenue: number; attendancePct: number };
 }
 
 export interface ServiceModule extends Base {

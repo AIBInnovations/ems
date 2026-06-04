@@ -13,6 +13,7 @@ export { admissionService } from "./admissionService";
 export { transportService } from "./transportService";
 export { notificationService, resolveRecipients } from "./notificationService";
 export { authService } from "./authService";
+export { platformService, platformStats, schoolMetrics, type PlatformStats, type SchoolMetrics } from "./platformService";
 
 // people
 export const guardianService = createCrudService("guardians", { label: (g) => fullName(g.firstName, g.lastName), origin: "Parents", noun: "guardian" });

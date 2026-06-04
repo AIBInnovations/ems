@@ -15,6 +15,7 @@ import { ScreenForItem, PlaceholderScreen } from "@/app/screens";
 import { ReceiptPrint, MarksheetPrint, IdCardPrint, AdmitCardPrint, TransferCertificatePrint } from "@/features/print/PrintDocs";
 import { ChatScreen } from "@/features/shared-domains/chat/ChatScreen";
 import { StudentDetailScreen } from "@/features/shared-domains/students/StudentDetailScreen";
+import { SchoolDetailScreen } from "@/features/super-admin/SchoolDetailScreen";
 import type { ReactNode } from "react";
 import { useAuthStore } from "@/store/auth";
 import { useCan } from "@/lib/rbac";
@@ -52,6 +53,12 @@ function buildAreaRoutes(): RouteObject[] {
       routes.push({
         path: `${area}/students/:id`,
         element: <Guard item={{ key: "student-detail", label: "Student", permission: "student.view", service: "students" }} area={area} element={<StudentDetailScreen />} />,
+      });
+    }
+    if (area === "super-admin") {
+      routes.push({
+        path: `super-admin/schools/:id`,
+        element: <Guard item={{ key: "school-detail", label: "School", permission: "school.toggle" }} area="super-admin" element={<SchoolDetailScreen />} />,
       });
     }
   }

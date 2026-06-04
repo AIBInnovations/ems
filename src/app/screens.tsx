@@ -20,6 +20,9 @@ const LiveTrackingScreen = lazy(() => import("@/features/shared-domains/transpor
 import { NotificationCenter } from "@/features/shared-domains/comms/NotificationCenter";
 import { ActivityMonitor } from "@/features/shared-domains/governance/ActivityMonitor";
 import { ServiceRegistryScreen } from "@/features/super-admin/ServiceRegistryScreen";
+import { AllSchoolsScreen } from "@/features/super-admin/AllSchoolsScreen";
+import { PlatformFinanceScreen } from "@/features/super-admin/PlatformFinanceScreen";
+import { PlatformOperationsScreen } from "@/features/super-admin/PlatformOperationsScreen";
 import { FeeCollectionScreen } from "@/features/shared-domains/finance/FeeCollectionScreen";
 import { MarksScreen } from "@/features/shared-domains/exams/MarksScreen";
 import { AttendanceScreen } from "@/features/shared-domains/attendance/AttendanceScreen";
@@ -199,6 +202,11 @@ const REGISTRY: Record<string, Factory> = {
   "member-documents": () => <DocumentsCenter />,
   "bulk-export": () => <DocumentsCenter />,
 
+  // super-admin platform screens
+  schools: () => <AllSchoolsScreen />,
+  "platform-finance": () => <PlatformFinanceScreen />,
+  "platform-operations": () => <PlatformOperationsScreen />,
+
   // governance / system
   activity: () => <ActivityMonitor />,
   services: () => <ServiceRegistryScreen />,
@@ -208,7 +216,6 @@ const REGISTRY: Record<string, Factory> = {
   settings: () => <Settings />,
   "school-profile": () => <SchoolProfileScreen />,
   school: () => <SchoolProfileScreen />,
-  schools: () => <SchoolProfileScreen />,
   "register-import": () => <DocumentsCenter />,
   "demo-reset": () => <Settings />,
 };

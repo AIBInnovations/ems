@@ -37,6 +37,7 @@ import {
   Boxes,
   MapPin,
   FileBarChart,
+  BarChart3,
   Home,
 } from "lucide-react";
 
@@ -52,113 +53,65 @@ export const NAVIGATION: Record<string, NavSection[]> = {
   "super-admin": [
     {
       groupKey: "nav.group.dashboard",
-      groupLabel: "Dashboard",
+      groupLabel: "Overview",
       items: [
-        {
-          key: "dashboard",
-          label: "Platform Dashboard",
-          icon: LayoutDashboard,
-          to: "/app/super-admin/dashboard",
-          exact: true,
-        },
+        { key: "dashboard", label: "Platform Dashboard", icon: LayoutDashboard, to: "/app/super-admin/dashboard", exact: true },
+        { key: "reports", label: "Platform Analytics", icon: BarChart3, to: "/app/super-admin/reports" },
       ],
     },
     {
       groupKey: "nav.group.governance",
-      groupLabel: "Governance",
+      groupLabel: "Schools",
       items: [
-        {
-          key: "schools",
-          label: "All Schools",
-          icon: Building2,
-          to: "/app/super-admin/schools",
-          permission: "school.toggle",
-        },
-        {
-          key: "school-profile",
-          label: "School Profile",
-          icon: School,
-          to: "/app/super-admin/school-profile",
-          permission: "school.toggle",
-        },
-        {
-          key: "services",
-          label: "Services Registry",
-          icon: Network,
-          to: "/app/super-admin/services",
-          permission: "service.toggle",
-        },
+        { key: "schools", label: "All Schools", icon: Building2, to: "/app/super-admin/schools", permission: "school.toggle" },
+        { key: "school-profile", label: "School Profile", icon: School, to: "/app/super-admin/school-profile", permission: "school.toggle" },
+      ],
+    },
+    {
+      groupKey: "nav.group.finance",
+      groupLabel: "Finance",
+      items: [
+        { key: "platform-finance", label: "Revenue & Billing", icon: Wallet, to: "/app/super-admin/platform-finance", permission: "finance.report" },
+      ],
+    },
+    {
+      groupKey: "nav.group.operations",
+      groupLabel: "Operations",
+      items: [
+        { key: "platform-operations", label: "Platform Operations", icon: Activity, to: "/app/super-admin/platform-operations" },
+        { key: "services", label: "Services Registry", icon: Network, to: "/app/super-admin/services", permission: "service.toggle" },
       ],
     },
     {
       groupKey: "nav.group.people",
       groupLabel: "People",
       items: [
-        {
-          key: "members",
-          label: "All Members",
-          icon: Users,
-          to: "/app/super-admin/members",
-          permission: "member.view",
-        },
-        {
-          key: "member-documents",
-          label: "Member Documents",
-          icon: FileText,
-          to: "/app/super-admin/member-documents",
-          permission: "document.view",
-          service: "documents",
-        },
+        { key: "members", label: "All Members", icon: Users, to: "/app/super-admin/members", permission: "member.view" },
+        { key: "member-documents", label: "Member Documents", icon: FileText, to: "/app/super-admin/member-documents", permission: "document.view", service: "documents" },
       ],
     },
     {
       groupKey: "nav.group.documents",
       groupLabel: "Documents",
       items: [
-        {
-          key: "templates",
-          label: "Templates Library",
-          icon: FileText,
-          to: "/app/super-admin/templates",
-          permission: "template.manage",
-          service: "documents",
-        },
-        {
-          key: "bulk-export",
-          label: "Bulk Export Center",
-          icon: FileBarChart,
-          to: "/app/super-admin/bulk-export",
-          permission: "document.generate",
-          service: "documents",
-        },
+        { key: "templates", label: "Templates Library", icon: FileText, to: "/app/super-admin/templates", permission: "template.manage", service: "documents" },
+        { key: "bulk-export", label: "Bulk Export Center", icon: FileBarChart, to: "/app/super-admin/bulk-export", permission: "document.generate", service: "documents" },
+      ],
+    },
+    {
+      groupKey: "nav.group.governance",
+      groupLabel: "Governance",
+      items: [
+        { key: "activity", label: "Activity Log", icon: Activity, to: "/app/super-admin/activity", permission: "activity.view", service: "activity" },
+        { key: "recycle-bin", label: "Recycle Bin", icon: Trash2, to: "/app/super-admin/recycle-bin", permission: "recyclebin.view", service: "recyclebin" },
       ],
     },
     {
       groupKey: "nav.group.settings",
-      groupLabel: "Settings",
+      groupLabel: "System",
       items: [
-        {
-          key: "settings",
-          label: "Settings",
-          icon: Settings,
-          to: "/app/super-admin/settings",
-          permission: "settings.manage",
-        },
-        {
-          key: "demo-reset",
-          label: "Reset Demo Data",
-          icon: Trash2,
-          to: "/app/super-admin/demo-reset",
-          permission: "demo.reset",
-        },
-        {
-          key: "activity",
-          label: "Activity Log",
-          icon: Activity,
-          to: "/app/super-admin/activity",
-          permission: "activity.view",
-          service: "activity",
-        },
+        { key: "settings", label: "Settings", icon: Settings, to: "/app/super-admin/settings", permission: "settings.manage" },
+        { key: "demo-reset", label: "Reset Demo Data", icon: Trash2, to: "/app/super-admin/demo-reset", permission: "demo.reset" },
       ],
     },
   ],

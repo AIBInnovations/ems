@@ -3,6 +3,7 @@ import { useAuthStore } from "@/store/auth";
 import type { RoleKey } from "@/types";
 
 import { AdminReports } from "./roles/AdminReports";
+import { PlatformAnalytics } from "./roles/PlatformAnalytics";
 import { PrincipalReports } from "./roles/PrincipalReports";
 import { AccountantReports } from "./roles/AccountantReports";
 import { LibraryReports } from "./roles/LibraryReports";
@@ -11,7 +12,7 @@ import { ExamReports } from "./roles/ExamReports";
 import { SportsReports } from "./roles/SportsReports";
 
 const MAP: Partial<Record<RoleKey, () => ReactNode>> = {
-  super_admin: () => <AdminReports />,
+  super_admin: () => <PlatformAnalytics />,
   admin: () => <AdminReports />,
   principal: () => <PrincipalReports />,
   accountant: () => <AccountantReports />,

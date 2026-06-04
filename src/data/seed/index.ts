@@ -5,6 +5,7 @@ import type {
   AttendanceStatus,
   PaymentMode,
   RoleKey,
+  School,
   StaffMember,
   Student,
 } from "@/types";
@@ -85,7 +86,50 @@ export function buildSeed(): DBShape {
     sessionStartMonth: 4,
     defaultLanguage: "en",
     isActive: true,
+    isPrimary: true,
+    region: "Madhya Pradesh",
+    plan: "premium",
+    subscriptionAmount: 180000,
+    subscriptionStatus: "active",
+    nextBillingDate: format(addDays(new Date(), 24), "yyyy-MM-dd"),
+    onboardedAt: "2009-06-01",
   });
+
+  // sister schools — summary-only records that give Super Admin a real portfolio
+  const SISTERS: { name: string; city: string; region: string; plan: School["plan"]; sub: number; status: School["subscriptionStatus"]; active: boolean; students: number; staff: number; revenue: number; att: number; est: number }[] = [
+    { name: "Greenwood International", city: "Indore", region: "Madhya Pradesh", plan: "enterprise", sub: 320000, status: "active", active: true, students: 1240, staff: 96, revenue: 1820000, att: 91, est: 2004 },
+    { name: "St. Xavier's Academy", city: "Bhopal", region: "Madhya Pradesh", plan: "standard", sub: 96000, status: "active", active: true, students: 540, staff: 41, revenue: 540000, att: 88, est: 2012 },
+    { name: "Riverdale Public School", city: "Jabalpur", region: "Madhya Pradesh", plan: "premium", sub: 180000, status: "overdue", active: true, students: 870, staff: 64, revenue: 980000, att: 85, est: 2010 },
+    { name: "Heritage Valley School", city: "Gwalior", region: "Madhya Pradesh", plan: "basic", sub: 48000, status: "trial", active: true, students: 210, staff: 18, revenue: 160000, att: 90, est: 2021 },
+    { name: "Sunrise Public — Ujjain", city: "Ujjain", region: "Madhya Pradesh", plan: "standard", sub: 96000, status: "active", active: false, students: 430, staff: 33, revenue: 0, att: 0, est: 2016 },
+  ];
+  SISTERS.forEach((s, i) =>
+    ctx.add("schools", {
+      name: s.name,
+      diseCode: `2345${rng.int(1000000, 9999999)}`,
+      licenseNo: `MP/EDU/${s.est}/${rng.int(1000, 9999)}`,
+      address: `${rng.int(1, 99)} School Road`,
+      city: s.city,
+      state: s.region,
+      pincode: `4620${rng.int(10, 99)}`,
+      phone: `+91 755 ${rng.int(1000000, 9999999)}`,
+      email: `office@${s.name.toLowerCase().replace(/[^a-z]/g, "")}.edu.in`,
+      socialLinks: {},
+      principalName: rng.pick(["Mrs. Kapoor", "Mr. Reddy", "Dr. Nair", "Ms. Iyer", "Mr. Bose"]),
+      establishedYear: s.est,
+      sessionStartMonth: 4,
+      defaultLanguage: "en",
+      isActive: s.active,
+      isPrimary: false,
+      region: s.region,
+      plan: s.plan,
+      subscriptionAmount: s.sub,
+      subscriptionStatus: s.status,
+      nextBillingDate: format(addDays(new Date(), [12, 40, -6, 18, 55][i]), "yyyy-MM-dd"),
+      onboardedAt: `${s.est}-06-01`,
+      metrics: { students: s.students, staff: s.staff, monthlyRevenue: s.revenue, attendancePct: s.att },
+    }),
+  );
 
   for (const s of SERVICE_MODULES) {
     ctx.add("serviceModules", {
