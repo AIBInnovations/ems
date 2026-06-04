@@ -1,0 +1,221 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --font-display: "Bricolage Grotesque", "Mukta", ui-sans-serif, system-ui, sans-serif;
+    --font-sans: "Plus Jakarta Sans", "Mukta", ui-sans-serif, system-ui, sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+    --background: 220 33% 98%;
+    --foreground: 222 30% 11%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222 30% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 30% 11%;
+
+    --primary: 231 64% 52%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 220 24% 95%;
+    --secondary-foreground: 220 22% 16%;
+
+    --muted: 220 24% 95%;
+    --muted-foreground: 220 9% 46%;
+
+    --accent: 38 92% 50%;
+    --accent-foreground: 222 30% 11%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 142 64% 38%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 222 30% 11%;
+    --info: 206 90% 48%;
+    --info-foreground: 0 0% 100%;
+
+    --teal: 178 52% 40%;
+
+    --border: 220 18% 90%;
+    --input: 220 18% 90%;
+    --ring: 231 64% 52%;
+
+    --radius: 0.625rem;
+
+    --chart-1: 231 64% 52%;
+    --chart-2: 178 52% 40%;
+    --chart-3: 38 92% 50%;
+    --chart-4: 270 50% 58%;
+    --chart-5: 206 90% 48%;
+
+    --sidebar: 222 30% 11%;
+    --sidebar-foreground: 220 24% 92%;
+    --sidebar-muted: 220 12% 62%;
+    --sidebar-border: 222 20% 20%;
+    --sidebar-active: 231 64% 60%;
+    --sidebar-active-foreground: 0 0% 100%;
+  }
+
+  .dark {
+    --background: 222 30% 9%;
+    --foreground: 220 24% 94%;
+
+    --card: 222 26% 12%;
+    --card-foreground: 220 24% 94%;
+    --popover: 222 26% 12%;
+    --popover-foreground: 220 24% 94%;
+
+    --primary: 231 70% 66%;
+    --primary-foreground: 222 47% 11%;
+
+    --secondary: 222 20% 18%;
+    --secondary-foreground: 220 24% 94%;
+
+    --muted: 222 20% 18%;
+    --muted-foreground: 220 12% 62%;
+
+    --accent: 38 95% 58%;
+    --accent-foreground: 222 47% 11%;
+
+    --destructive: 0 75% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 142 60% 48%;
+    --success-foreground: 222 47% 11%;
+    --warning: 38 95% 58%;
+    --warning-foreground: 222 47% 11%;
+    --info: 206 90% 60%;
+    --info-foreground: 222 47% 11%;
+
+    --teal: 178 55% 52%;
+
+    --border: 222 16% 22%;
+    --input: 222 16% 24%;
+    --ring: 231 70% 66%;
+
+    --chart-1: 231 70% 66%;
+    --chart-2: 178 55% 52%;
+    --chart-3: 38 95% 58%;
+    --chart-4: 270 55% 68%;
+    --chart-5: 206 90% 64%;
+
+    --sidebar: 224 32% 8%;
+    --sidebar-foreground: 220 20% 86%;
+    --sidebar-muted: 220 12% 56%;
+    --sidebar-border: 222 22% 16%;
+    --sidebar-active: 231 70% 66%;
+    --sidebar-active-foreground: 222 47% 11%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+    /* Always reserve the scrollbar gutter so opening a dialog/menu (which locks
+       body scroll) doesn't shift the whole layout sideways. */
+    scrollbar-gutter: stable;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: var(--font-sans);
+    font-feature-settings: "cv02", "cv03", "cv04";
+    font-size: 15px;
+    line-height: 1.47;
+    min-height: 100dvh;
+  }
+
+  /* Hindi / Devanagari: swap both display + sans stacks to Mukta */
+  html[lang="hi"] {
+    --font-display: "Mukta", "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+    --font-sans: "Mukta", "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  }
+
+  h1, h2, h3, h4, .font-display {
+    font-family: var(--font-display);
+  }
+
+  /* Tabular numerals for finance/IDs */
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+
+  :focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px hsl(var(--ring) / 0.35);
+    border-radius: calc(var(--radius) - 2px);
+  }
+
+  /* Slim, themed scrollbars */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted-foreground) / 0.3);
+    border-radius: 9999px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground) / 0.5);
+    background-clip: padding-box;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+}
+
+@layer utilities {
+  .shadow-focus {
+    box-shadow: 0 0 0 3px hsl(var(--ring) / 0.35);
+  }
+  .text-balance {
+    text-wrap: balance;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .bg-grid {
+    background-image:
+      linear-gradient(hsl(var(--border) / 0.6) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(var(--border) / 0.6) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Print: hide app chrome, A4 page surfaces */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: #fff;
+  }
+  .print-page {
+    box-shadow: none !important;
+    margin: 0 !important;
+  }
+}
