@@ -60,11 +60,10 @@ export const NAVIGATION: Record<string, NavSection[]> = {
       ],
     },
     {
-      groupKey: "nav.group.governance",
+      groupKey: "nav.group.schools",
       groupLabel: "Schools",
       items: [
         { key: "schools", label: "All Schools", icon: Building2, to: "/app/super-admin/schools", permission: "school.toggle" },
-        { key: "school-profile", label: "School Profile", icon: School, to: "/app/super-admin/school-profile", permission: "school.toggle" },
       ],
     },
     {
@@ -86,16 +85,7 @@ export const NAVIGATION: Record<string, NavSection[]> = {
       groupKey: "nav.group.people",
       groupLabel: "People",
       items: [
-        { key: "members", label: "All Members", icon: Users, to: "/app/super-admin/members", permission: "member.view" },
-        { key: "member-documents", label: "Member Documents", icon: FileText, to: "/app/super-admin/member-documents", permission: "document.view", service: "documents" },
-      ],
-    },
-    {
-      groupKey: "nav.group.documents",
-      groupLabel: "Documents",
-      items: [
-        { key: "templates", label: "Templates Library", icon: FileText, to: "/app/super-admin/templates", permission: "template.manage", service: "documents" },
-        { key: "bulk-export", label: "Bulk Export Center", icon: FileBarChart, to: "/app/super-admin/bulk-export", permission: "document.generate", service: "documents" },
+        { key: "members", label: "Platform Members", icon: Users, to: "/app/super-admin/members", permission: "member.view" },
       ],
     },
     {
@@ -107,7 +97,7 @@ export const NAVIGATION: Record<string, NavSection[]> = {
       ],
     },
     {
-      groupKey: "nav.group.settings",
+      groupKey: "nav.group.system",
       groupLabel: "System",
       items: [
         { key: "settings", label: "Settings", icon: Settings, to: "/app/super-admin/settings", permission: "settings.manage" },
@@ -439,6 +429,13 @@ export const NAVIGATION: Record<string, NavSection[]> = {
       groupKey: "nav.group.settings",
       groupLabel: "Settings",
       items: [
+        {
+          key: "school-profile",
+          label: "School Profile",
+          icon: School,
+          to: "/app/admin/school-profile",
+          permission: "settings.manage",
+        },
         {
           key: "settings",
           label: "Settings",

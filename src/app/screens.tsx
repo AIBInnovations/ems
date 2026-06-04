@@ -1,5 +1,6 @@
-import { lazy, type ReactNode } from "react";
+import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
+import { lazyWithRetry } from "@/lib/lazyRetry";
 import { Link } from "react-router-dom";
 import { Construction } from "lucide-react";
 import { PageHeader } from "@/components/shared/PageHeader";
@@ -15,14 +16,15 @@ import { StudentsScreen } from "@/features/shared-domains/students/StudentsScree
 
 import { ReportsRouter } from "@/features/reports/ReportsRouter";
 
-// only the leaflet/heavy-but-secondary screens stay lazy
-const LiveTrackingScreen = lazy(() => import("@/features/shared-domains/transport/LiveTrackingScreen").then((m) => ({ default: m.LiveTrackingScreen })));
+// only the leaflet/heavy-but-secondary screens stay lazy (with stale-chunk retry)
+const LiveTrackingScreen = lazyWithRetry(() => import("@/features/shared-domains/transport/LiveTrackingScreen").then((m) => ({ default: m.LiveTrackingScreen })));
 import { NotificationCenter } from "@/features/shared-domains/comms/NotificationCenter";
 import { ActivityMonitor } from "@/features/shared-domains/governance/ActivityMonitor";
 import { ServiceRegistryScreen } from "@/features/super-admin/ServiceRegistryScreen";
 import { AllSchoolsScreen } from "@/features/super-admin/AllSchoolsScreen";
 import { PlatformFinanceScreen } from "@/features/super-admin/PlatformFinanceScreen";
 import { PlatformOperationsScreen } from "@/features/super-admin/PlatformOperationsScreen";
+import { PlatformMembersScreen } from "@/features/super-admin/PlatformMembersScreen";
 import { FeeCollectionScreen } from "@/features/shared-domains/finance/FeeCollectionScreen";
 import { MarksScreen } from "@/features/shared-domains/exams/MarksScreen";
 import { AttendanceScreen } from "@/features/shared-domains/attendance/AttendanceScreen";
@@ -30,6 +32,7 @@ import { ChatScreen } from "@/features/shared-domains/chat/ChatScreen";
 import { LibraryCirculationScreen } from "@/features/shared-domains/library/LibraryCirculationScreen";
 import { SyllabusReader } from "@/features/shared-domains/syllabus/SyllabusReader";
 import { LiveVideoRoom } from "@/features/shared-domains/live-video/LiveVideoRoom";
+import { LearningHub } from "@/features/shared-domains/learning/LearningHub";
 import { TimetableScreen } from "@/features/shared-domains/academics/TimetableScreen";
 import { PermissionMatrix } from "@/features/shared-domains/governance/PermissionMatrix";
 import { RateTeachersScreen } from "@/features/shared-domains/feedback/RateTeachersScreen";
@@ -95,7 +98,7 @@ const REGISTRY: Record<string, Factory> = {
   promotions: () => <PromotionScreen />,
   staff: list(staffResource),
   "staff-performance": () => <ReportsRouter />,
-  members: list(staffResource),
+  members: (area) => (area === "super-admin" ? <PlatformMembersScreen /> : <ResourceListPage config={staffResource as ResourceConfig<CollectionName>} />),
   classes: list(classResource),
   "classes-sections": list(classResource),
   subjects: list(subjectResource),
@@ -103,7 +106,7 @@ const REGISTRY: Record<string, Factory> = {
   papers: list(examResource),
   "exam-duty": list(examResource),
   homework: list(homeworkResource),
-  learning: list(learningResource),
+  learning: (area) => (area === "student" || area === "parent" ? <LearningHub /> : <ResourceListPage config={learningResource as ResourceConfig<CollectionName>} />),
   "admission-fields": list(fieldResource),
   admissions: list(inquiryResource),
   timetable: () => <TimetableScreen />,
@@ -147,8 +150,8 @@ const REGISTRY: Record<string, Factory> = {
   bookings: list(labBookingResource),
   practicals: list(labBookingResource),
   maintenance: list(labMaintenanceResource),
-  "digital-resources": list(learningResource),
-  "digital-library": list(learningResource),
+  "digital-resources": (area) => (area === "student" || area === "parent" ? <LearningHub /> : <ResourceListPage config={learningResource as ResourceConfig<CollectionName>} />),
+  "digital-library": (area) => (area === "student" || area === "parent" ? <LearningHub /> : <ResourceListPage config={learningResource as ResourceConfig<CollectionName>} />),
   inventory: (area) => (area === "lab" ? <ResourceListPage config={labItemResource as ResourceConfig<CollectionName>} /> : <ResourceListPage config={bookResource as ResourceConfig<CollectionName>} />),
 
   // sports

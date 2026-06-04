@@ -1,7 +1,7 @@
 import { COLLECTION_NAMES, type CollectionName, type EntityOf } from "@/types";
 
 /** Bump to force a re-seed (migration boundary). */
-export const SCHEMA_VERSION = 6;
+export const SCHEMA_VERSION = 7;
 export const STORAGE_KEY = `ems-suite:v${SCHEMA_VERSION}`;
 export const LEGACY_PREFIX = "ems-suite:v";
 

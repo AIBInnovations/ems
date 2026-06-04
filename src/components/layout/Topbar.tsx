@@ -49,7 +49,11 @@ export function Topbar() {
   const logout = useAuthStore((s) => s.logout);
   const lock = useAuthStore((s) => s.lock);
 
-  const school = db.getAll("schools")[0];
+  // Super Admin operates the whole platform — show the platform brand, not one school.
+  const isPlatform = user?.roleKey === "super_admin";
+  const primarySchool = db.getAll("schools").find((s) => s.isPrimary) ?? db.getAll("schools")[0];
+  const brandName = isPlatform ? "EMS Platform" : primarySchool?.name ?? "EMS Suite";
+  const brandSubtitle = isPlatform ? `${db.getAll("schools").length} schools` : undefined;
   const notifications = db.getAll("notifications").filter((n) => n.status === "sent").slice(-6).reverse();
   const area = user ? ROLE_AREA[user.roleKey] : "admin";
   const [first, ...rest] = displayName.split(" ");
@@ -70,7 +74,10 @@ export function Topbar() {
             <path d="M9 15v5c0 1.7 3.1 3 7 3s7-1.3 7-3v-5l-7 3.5L9 15Z" fill="currentColor" opacity="0.6" />
           </svg>
         </span>
-        <span className="hidden font-display text-base font-semibold sm:inline">{school?.name ?? "EMS Suite"}</span>
+        <span className="hidden flex-col leading-tight sm:flex">
+          <span className="font-display text-base font-semibold">{brandName}</span>
+          {brandSubtitle ? <span className="text-[11px] font-normal text-muted-foreground">{brandSubtitle}</span> : null}
+        </span>
       </Link>
 
       <button

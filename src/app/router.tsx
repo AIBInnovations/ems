@@ -16,6 +16,7 @@ import { ReceiptPrint, MarksheetPrint, IdCardPrint, AdmitCardPrint, TransferCert
 import { ChatScreen } from "@/features/shared-domains/chat/ChatScreen";
 import { StudentDetailScreen } from "@/features/shared-domains/students/StudentDetailScreen";
 import { SchoolDetailScreen } from "@/features/super-admin/SchoolDetailScreen";
+import { RouteError } from "@/app/RouteError";
 import type { ReactNode } from "react";
 import { useAuthStore } from "@/store/auth";
 import { useCan } from "@/lib/rbac";
@@ -76,6 +77,7 @@ export const router = createBrowserRouter([
   {
     path: "/app",
     element: <AppShell />,
+    errorElement: <RouteError />,
     children: [
       { index: true, element: <RoleIndexRedirect /> },
       ...buildAreaRoutes(),

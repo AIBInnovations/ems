@@ -1143,35 +1143,75 @@ function buildContent(ctx: SeedCtx, classes: { id: string; name: string; subject
       });
     });
   });
-  // a scheduled live class + a quiz on the demo class
-  const demo = targets.find((c) => c.name === "Class 10");
-  if (demo) {
-    const subjectId = demo.subjectIds[0];
-    const cst = ctx.all("classSubjectTeachers").find((c) => c.classId === demo.id && c.subjectId === subjectId);
+  // learning resources (videos / pdfs / links) per target class + subject
+  const RES_KINDS: { kind: "video" | "pdf" | "link"; verb: string; sizeMB?: number }[] = [
+    { kind: "video", verb: "Video Lesson", sizeMB: 48 },
+    { kind: "pdf", verb: "Notes (PDF)", sizeMB: 2 },
+    { kind: "link", verb: "Practice Worksheet" },
+  ];
+  targets.forEach((cls) => {
+    cls.subjectIds.slice(0, 4).forEach((subjectId) => {
+      const subj = ctx.db.subjects[subjectId];
+      const teacher = ctx.all("classSubjectTeachers").find((c) => c.classId === cls.id && c.subjectId === subjectId)?.teacherStaffId ?? "";
+      RES_KINDS.forEach((r) =>
+        ctx.add("learningResources", {
+          classId: cls.id,
+          subjectId,
+          title: `${subj?.name ?? "Subject"} — ${r.verb}`,
+          kind: r.kind,
+          url: r.kind === "video" ? "https://www.youtube.com/embed/dQw4w9WgXcQ" : r.kind === "pdf" ? "demo://pdf/" + newId() : "https://example.com/worksheet",
+          sizeMB: r.sizeMB,
+          uploadedByStaffId: teacher,
+          visibleTo: "class",
+        }),
+      );
+    });
+  });
+
+  // quizzes + a scheduled live class on the target classes
+  const QUIZ_BANK: { title: string; subjectCode: string; qs: { text: string; options: string[]; correctIndex: number }[] }[] = [
+    { title: "Science — Chapter 1 Quiz", subjectCode: "SCI", qs: [
+      { text: "What is the SI unit of force?", options: ["Newton", "Joule", "Watt", "Pascal"], correctIndex: 0 },
+      { text: "Water freezes at?", options: ["0°C", "100°C", "50°C", "-10°C"], correctIndex: 0 },
+      { text: "The powerhouse of the cell is?", options: ["Mitochondria", "Nucleus", "Ribosome", "Golgi body"], correctIndex: 0 },
+      { text: "Speed = distance ÷ ?", options: ["Time", "Mass", "Force", "Area"], correctIndex: 0 },
+    ] },
+    { title: "Mathematics — Quick Test", subjectCode: "MAT", qs: [
+      { text: "2 + 2 × 2 = ?", options: ["6", "8", "4", "10"], correctIndex: 0 },
+      { text: "Area of a circle is?", options: ["πr²", "2πr", "πd", "r²"], correctIndex: 0 },
+      { text: "√144 = ?", options: ["12", "14", "10", "16"], correctIndex: 0 },
+    ] },
+    { title: "English — Grammar Quiz", subjectCode: "ENG", qs: [
+      { text: "Choose the noun: 'She runs fast.'", options: ["She", "runs", "fast", "none"], correctIndex: 0 },
+      { text: "Past tense of 'go'?", options: ["went", "goed", "gone", "going"], correctIndex: 0 },
+      { text: "Antonym of 'happy'?", options: ["sad", "glad", "joy", "merry"], correctIndex: 0 },
+    ] },
+  ];
+  targets.forEach((cls) => {
+    QUIZ_BANK.forEach((q) => {
+      const subjectId = cls.subjectIds.find((id) => ctx.db.subjects[id]?.code === q.subjectCode) ?? cls.subjectIds[0];
+      ctx.add("quizzes", {
+        classId: cls.id,
+        subjectId,
+        title: q.title,
+        totalMarks: q.qs.length,
+        dueDate: format(addDays(new Date(), rng.int(2, 9)), "yyyy-MM-dd"),
+        questions: q.qs.map((qq) => ({ id: newId(), text: qq.text, options: qq.options, correctIndex: qq.correctIndex, marks: 1 })),
+      });
+    });
+    const subjectId = cls.subjectIds[0];
+    const cst = ctx.all("classSubjectTeachers").find((c) => c.classId === cls.id && c.subjectId === subjectId);
     ctx.add("liveClasses", {
-      title: `${ctx.db.subjects[subjectId]?.name ?? "Live"} Revision Class`,
-      classId: demo.id,
+      title: `${ctx.db.subjects[subjectId]?.name ?? "Live"} Revision Class — ${cls.name}`,
+      classId: cls.id,
       hostStaffId: cst?.teacherStaffId ?? "",
-      scheduledAt: iso(addDays(new Date(), 1)),
+      scheduledAt: iso(addDays(new Date(), rng.int(1, 4))),
       status: "scheduled",
       recipientScope: "class",
       joinUrl: "demo://room/" + newId(),
       participants: [],
     });
-    ctx.add("quizzes", {
-      classId: demo.id,
-      subjectId,
-      title: "Quick Quiz — Chapter 1",
-      totalMarks: 5,
-      dueDate: format(addDays(new Date(), 3), "yyyy-MM-dd"),
-      questions: [
-        { id: newId(), text: "What is the SI unit of force?", options: ["Newton", "Joule", "Watt", "Pascal"], correctIndex: 0, marks: 1 },
-        { id: newId(), text: "Water freezes at?", options: ["0°C", "100°C", "50°C", "-10°C"], correctIndex: 0, marks: 1 },
-        { id: newId(), text: "2 + 2 × 2 = ?", options: ["6", "8", "4", "10"], correctIndex: 0, marks: 1 },
-      ],
-    });
-  }
-  void rng;
+  });
 }
 
 function buildComms(ctx: SeedCtx, students: Student[], staff: StaffMember[]) {
